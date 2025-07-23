@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  /* Top wave pattern */
+  .top-wave-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .top-wave-lines {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 255, 136, 0.1) 3px,
+        rgba(0, 255, 136, 0.1) 6px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 4px,
+        rgba(59, 130, 246, 0.1) 4px,
+        rgba(59, 130, 246, 0.1) 8px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 5px,
+        rgba(136, 0, 255, 0.08) 5px,
+        rgba(136, 0, 255, 0.08) 10px
+      );
+    background-size: 100px 100%, 150px 150%, 200px 200%;
+    mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+    animation: topWaveAnimation 20s infinite linear;
+  }
+
+  .top-wave-lines::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: repeating-linear-gradient(
+        15deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.05) 2px,
+        rgba(255, 255, 255, 0.05) 4px
+      ),
+      repeating-linear-gradient(
+        -15deg,
+        transparent,
+        transparent 3px,
+        rgba(16, 185, 129, 0.1) 3px,
+        rgba(16, 185, 129, 0.1) 6px
+      );
+    background-size: 120px 120%, 180px 180%;
+    animation: topWaveAnimation 15s infinite linear reverse;
+  }
+
+  @keyframes topWaveAnimation {
+    0% {
+      background-position: 0% 0%, 0% 0%, 0% 0%;
+    }
+    100% {
+      background-position: 100px 0%, 150px 0%, 200px 0%;
+    }
+  }
+
+  /* Floating wave effect for top */
+  .floating-top-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  .floating-wave-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    animation: floatTopWave 25s infinite ease-in-out;
+  }
+
+  @keyframes floatTopWave {
+    0%,
+    100% {
+      transform: translateX(0) translateY(0);
+    }
+    25% {
+      transform: translateX(20px) translateY(-10px);
+    }
+    50% {
+      transform: translateX(-10px) translateY(-20px);
+    }
+    75% {
+      transform: translateX(15px) translateY(-5px);
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background: #0a0a0f;
+    min-height: 100vh;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
