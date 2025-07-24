@@ -1,38 +1,33 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useChampions } from "@/lib/champion-context"
-import type { ChampionGrade } from "@/lib/types"
-import { Lock, Plus, Trash2, Users, ArrowLeft, Download, Upload, RefreshCw } from "lucide-react"
+import type { Champion } from "@/lib/types"
+import { Lock, Plus, Trash2, Users, ArrowLeft, RefreshCw, Edit, Database, Upload } from "lucide-react"
 import Link from "next/link"
-import { ImageMigration } from "@/components/image-migration"
+import { ChampionEditModal } from "@/components/champion-edit-modal"
 
 export default function AdminPage() {
   const {
     champions,
     addChampion,
+    editChampion,
     removeChampion,
+    refreshChampions,
     loadSampleData,
-    clearAllData,
+    checkStorageFiles,
     isAuthenticated,
     authenticate,
     logout,
+    loading,
   } = useChampions()
-  const [password, setPassword] = useState("")
-  const [activeTab, setActiveTab] = useState<"register" | "manage" | "data">("register")
-  const [showPassword, setShowPassword] = useState(!isAuthenticated)
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    organization: "",
-    role: "",
-    grade: "그린" as ChampionGrade,
-    message: "",
-    specialties: "",
-  })
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(!isAuthenticated)
+  const [editingChampion, setEditingChampion] = useState<Champion | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isNewChampion, setIsNewChampion] = useState(false)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,44 +39,74 @@ export default function AdminPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.name || !formData.organization || !formData.role || !formData.message) {
-      alert("모든 필수 항목을 입력해주세요.")
-      return
-    }
-
-    addChampion({
-      ...formData,
-      specialties: formData.specialties
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s),
-    })
-
-    setFormData({
-      name: "",
-      organization: "",
-      role: "",
-      grade: "그린",
-      message: "",
-      specialties: "",
-    })
-
-    alert("챔피언이 성공적으로 등록되었습니다!")
+  const handleAddChampion = () => {
+    setEditingChampion(null)
+    setIsNewChampion(true)
+    setIsModalOpen(true)
   }
 
-  const handleLoadSampleData = () => {
-    if (confirm("샘플 데이터를 로드하시겠습니까? 기존 데이터는 유지됩니다.")) {
-      loadSampleData()
-      alert("샘플 데이터가 로드되었습니다!")
+  const handleEditChampion = (champion: Champion) => {
+    setEditingChampion(champion)
+    setIsNewChampion(false)
+    setIsModalOpen(true)
+  }
+
+  const handleSaveChampion = async (championData: Partial<Champion>) => {
+    try {
+      if (isNewChampion) {
+        await addChampion(championData as Omit<Champion, "id" | "createdAt">)
+        alert("챔피언이 성공적으로 등록되었습니다!")
+      } else if (editingChampion) {
+        await editChampion(editingChampion.id, championData)
+        alert("챔피언 정보가 성공적으로 수정되었습니다!")
+      }
+    } catch (error) {
+      console.error("저장 실패:", error)
+      throw error
     }
   }
 
-  const handleClearAllData = () => {
-    if (confirm("모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
-      clearAllData()
-      alert("모든 데이터가 삭제되었습니다.")
+  const handleDeleteChampion = async (champion: Champion) => {
+    if (confirm(`${champion.name} 챔피언을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+      try {
+        await removeChampion(champion.id)
+        alert("챔피언이 삭제되었습니다.")
+      } catch (error) {
+        console.error("삭제 실패:", error)
+        alert("삭제에 실패했습니다.")
+      }
+    }
+  }
+
+  const handleRefreshData = async () => {
+    try {
+      await refreshChampions()
+      alert("데이터가 새로고침되었습니다!")
+    } catch (error) {
+      console.error("새로고침 실패:", error)
+      alert("데이터 새로고침에 실패했습니다.")
+    }
+  }
+
+  const handleLoadSampleData = async () => {
+    if (confirm("샘플 데이터를 로드하시겠습니까? 기존 데이터와 중복되지 않는 데이터만 추가됩니다.")) {
+      try {
+        const result = await loadSampleData()
+        alert(result.message)
+      } catch (error) {
+        console.error("샘플 데이터 로드 실패:", error)
+        alert("샘플 데이터 로드에 실패했습니다.")
+      }
+    }
+  }
+
+  const handleCheckStorage = async () => {
+    try {
+      await checkStorageFiles()
+      alert("Storage 파일 목록을 콘솔에서 확인하세요.")
+    } catch (error) {
+      console.error("Storage 확인 실패:", error)
+      alert("Storage 확인에 실패했습니다.")
     }
   }
 
@@ -133,6 +158,12 @@ export default function AdminPage() {
                   <ArrowLeft className="w-5 h-5 text-white/70" />
                 </Link>
                 <h1 className="text-2xl font-bold text-white">관리자 페이지</h1>
+                {loading && (
+                  <div className="ml-4 flex items-center text-white/60">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/60 mr-2"></div>
+                    로딩 중...
+                  </div>
+                )}
               </div>
               <button
                 onClick={logout}
@@ -145,147 +176,91 @@ export default function AdminPage() {
         </header>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Tabs */}
-          <div className="flex space-x-1 bg-white/5 backdrop-blur-sm rounded-lg p-1 mb-8 max-w-lg">
-            <button
-              onClick={() => setActiveTab("register")}
-              className={`flex-1 flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all ${
-                activeTab === "register"
-                  ? "bg-purple-500 text-white shadow-lg"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              챔피언 등록
-            </button>
-            <button
-              onClick={() => setActiveTab("manage")}
-              className={`flex-1 flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all ${
-                activeTab === "manage"
-                  ? "bg-purple-500 text-white shadow-lg"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <Users className="w-4 h-4 mr-2" />
-              챔피언 관리
-            </button>
-            <button
-              onClick={() => setActiveTab("data")}
-              className={`flex-1 flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all ${
-                activeTab === "data"
-                  ? "bg-purple-500 text-white shadow-lg"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              데이터 관리
-            </button>
+          {/* 관리 도구 */}
+          <div className="bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 mb-8">
+            <h2 className="text-lg font-bold text-white mb-4">관리 도구</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <button
+                onClick={handleRefreshData}
+                className="px-4 py-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors flex items-center justify-center"
+                disabled={loading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                데이터 새로고침
+              </button>
+              <button
+                onClick={handleLoadSampleData}
+                className="px-4 py-3 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors flex items-center justify-center"
+                disabled={loading}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                샘플 데이터 로드
+              </button>
+              <button
+                onClick={handleCheckStorage}
+                className="px-4 py-3 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-colors flex items-center justify-center"
+              >
+                <Database className="w-4 h-4 mr-2" />
+                Storage 확인
+              </button>
+              <button
+                onClick={handleAddChampion}
+                className="px-4 py-3 bg-yellow-500/20 text-yellow-300 rounded-lg hover:bg-yellow-500/30 transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-4 h-4 mr-2" />새 챔피언 추가
+              </button>
+            </div>
           </div>
 
-          {/* Register Tab */}
-          {activeTab === "register" && (
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-8 border border-white/10">
-              <h2 className="text-xl font-bold text-white mb-6">새 챔피언 등록</h2>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">이름 *</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="챔피언 이름"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">소속 *</label>
-                    <input
-                      type="text"
-                      value={formData.organization}
-                      onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="소속 기관"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">담당업무 *</label>
-                    <input
-                      type="text"
-                      value={formData.role}
-                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="담당 업무"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">등급</label>
-                    <select
-                      value={formData.grade}
-                      onChange={(e) => setFormData({ ...formData, grade: e.target.value as ChampionGrade })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="그린">그린</option>
-                      <option value="블루">블루</option>
-                      <option value="블랙">블랙</option>
-                      <option value="거점리더">거점리더</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white/80 text-sm font-medium mb-2">전문분야</label>
-                  <input
-                    type="text"
-                    value={formData.specialties}
-                    onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="전문분야를 쉼표로 구분하여 입력 (예: AI, 머신러닝, 데이터분석)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white/80 text-sm font-medium mb-2">한마디 메시지 *</label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="챔피언의 한마디 메시지"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-700 transition-all"
-                >
-                  챔피언 등록
-                </button>
-              </form>
+          {/* 챔피언 목록 */}
+          <div className="bg-white/5 backdrop-blur-md rounded-xl p-8 border border-white/10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">챔피언 목록 ({champions.length}명)</h2>
             </div>
-          )}
 
-          {/* Manage Tab */}
-          {activeTab === "manage" && (
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-8 border border-white/10">
-              <h2 className="text-xl font-bold text-white mb-6">챔피언 관리 ({champions.length}명)</h2>
+            {champions.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <p className="text-white/60">등록된 챔피언이 없습니다.</p>
+                <p className="text-white/40 text-sm mt-2">샘플 데이터를 로드하거나 새 챔피언을 추가해보세요.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {champions.map((champion) => (
+                  <div
+                    key={champion.id}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center space-x-4">
+                      {/* 프로필 이미지 */}
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/10">
+                        {champion.profileImage ? (
+                          <img
+                            src={champion.profileImage || "/placeholder.svg"}
+                            alt={champion.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error(
+                                `관리자 페이지 이미지 로딩 실패: ${champion.name} - ${champion.profileImage}`,
+                              )
+                              e.currentTarget.style.display = "none"
+                              const parent = e.currentTarget.parentElement
+                              if (parent) {
+                                parent.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white/40"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path></svg></div>`
+                              }
+                            }}
+                            onLoad={() => {
+                              console.log(`관리자 페이지 이미지 로딩 성공: ${champion.name}`)
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white/40">
+                            <Users className="w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
 
-              {champions.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                  <p className="text-white/60">등록된 챔피언이 없습니다.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {champions.map((champion) => (
-                    <div
-                      key={champion.id}
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
-                    >
+                      {/* 챔피언 정보 */}
                       <div className="flex-1">
                         <h3 className="text-white font-semibold">{champion.name}</h3>
                         <p className="text-white/70 text-sm">
@@ -295,7 +270,7 @@ export default function AdminPage() {
                           <span
                             className={`inline-block px-2 py-1 text-xs rounded ${
                               champion.grade === "거점리더"
-                                ? "bg-white/20 text-white"
+                                ? "bg-yellow-500/20 text-yellow-300"
                                 : champion.grade === "블랙"
                                   ? "bg-gray-800/50 text-gray-300"
                                   : champion.grade === "블루"
@@ -305,101 +280,87 @@ export default function AdminPage() {
                           >
                             {champion.grade}
                           </span>
-                          <span className="text-xs text-white/50">전문분야: {champion.specialties.join(", ")}</span>
+                          <span className="text-xs text-white/50">
+                            전문분야: {champion.specialties.join(", ") || "없음"}
+                          </span>
                         </div>
+                        {champion.profileImage && (
+                          <p className="text-xs text-white/30 mt-1 truncate">이미지: {champion.profileImage}</p>
+                        )}
                       </div>
+                    </div>
+
+                    {/* 액션 버튼 */}
+                    <div className="flex space-x-2">
                       <button
-                        onClick={() => {
-                          if (confirm(`${champion.name} 챔피언을 삭제하시겠습니까?`)) {
-                            removeChampion(champion.id)
-                          }
-                        }}
+                        onClick={() => handleEditChampion(champion)}
+                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-colors"
+                        title="수정"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteChampion(champion)}
                         className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="삭제"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Data Management Tab */}
-          {activeTab === "data" && (
-            <div className="bg-white/5 backdrop-blur-md rounded-xl p-8 border border-white/10">
-              <h2 className="text-xl font-bold text-white mb-6">데이터 관리</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                  <div className="flex items-center mb-4">
-                    <Upload className="w-6 h-6 text-green-400 mr-3" />
-                    <h3 className="text-lg font-semibold text-white">샘플 데이터 로드</h3>
                   </div>
-                  <p className="text-white/70 text-sm mb-4">
-                    행정안전부 AI 챔피언 샘플 데이터를 로드합니다. 거점리더 3명, 블랙 4명, 블루 5명, 그린 6명의 데이터가
-                    포함됩니다.
-                  </p>
-                  <button
-                    onClick={handleLoadSampleData}
-                    className="w-full bg-green-500/20 text-green-300 py-3 rounded-lg font-semibold hover:bg-green-500/30 transition-all border border-green-500/30"
-                  >
-                    샘플 데이터 로드
-                  </button>
-                </div>
+                ))}
+              </div>
+            )}
 
-                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                  <div className="flex items-center mb-4">
-                    <RefreshCw className="w-6 h-6 text-red-400 mr-3" />
-                    <h3 className="text-lg font-semibold text-white">전체 데이터 삭제</h3>
-                  </div>
-                  <p className="text-white/70 text-sm mb-4">
-                    모든 챔피언 데이터를 삭제합니다. 이 작업은 되돌릴 수 없으니 신중하게 선택하세요.
+            {/* 현재 데이터 현황 */}
+            <div className="mt-8 bg-white/5 rounded-lg p-6 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">현재 데이터 현황</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-yellow-300">
+                    {champions.filter((c) => c.grade === "거점리더").length}
                   </p>
-                  <button
-                    onClick={handleClearAllData}
-                    className="w-full bg-red-500/20 text-red-300 py-3 rounded-lg font-semibold hover:bg-red-500/30 transition-all border border-red-500/30"
-                  >
-                    전체 데이터 삭제
-                  </button>
+                  <p className="text-sm text-white/70">거점리더</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-300">
+                    {champions.filter((c) => c.grade === "블랙").length}
+                  </p>
+                  <p className="text-sm text-white/70">블랙</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-300">
+                    {champions.filter((c) => c.grade === "블루").length}
+                  </p>
+                  <p className="text-sm text-white/70">블루</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-300">
+                    {champions.filter((c) => c.grade === "그린").length}
+                  </p>
+                  <p className="text-sm text-white/70">그린</p>
                 </div>
               </div>
 
-              <ImageMigration />
-
-              <div className="mt-8 bg-white/5 rounded-lg p-6 border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">현재 데이터 현황</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">
-                      {champions.filter((c) => c.grade === "거점리더").length}
-                    </p>
-                    <p className="text-sm text-white/70">거점리더</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-gray-300">
-                      {champions.filter((c) => c.grade === "블랙").length}
-                    </p>
-                    <p className="text-sm text-white/70">블랙</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-blue-300">
-                      {champions.filter((c) => c.grade === "블루").length}
-                    </p>
-                    <p className="text-sm text-white/70">블루</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-green-300">
-                      {champions.filter((c) => c.grade === "그린").length}
-                    </p>
-                    <p className="text-sm text-white/70">그린</p>
-                  </div>
-                </div>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-white/60">
+                  프로필 이미지: {champions.filter((c) => c.profileImage).length}명 / 실루엣 아바타:{" "}
+                  {champions.filter((c) => !c.profileImage).length}명
+                </p>
               </div>
             </div>
-          )}
+          </div>
         </main>
       </div>
+
+      {/* 편집 모달 */}
+      <ChampionEditModal
+        champion={editingChampion}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveChampion}
+        isNew={isNewChampion}
+      />
     </div>
   )
 }

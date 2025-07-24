@@ -1,173 +1,238 @@
 import type { Champion } from "./types"
 
-export const sampleChampions: Omit<Champion, "id">[] = [
-  // 거점리더 등급
+// 샘플 챔피언 데이터 (프로필 이미지 파일명 포함)
+export const sampleChampions: Omit<Champion, "id" | "createdAt">[] = [
+  // 사진이 있는 챔피언들 (9명)
   {
     name: "김정수",
-    organization: "행정안전부 디지털정부국",
-    role: "디지털정부국장",
+    organization: "과학기술정보통신부",
+    role: "AI정책과장",
     grade: "거점리더",
-    message: "AI 기술로 국민 모두가 편리한 디지털 정부를 만들어가겠습니다.",
-    specialties: ["디지털정부정책", "AI거버넌스", "데이터정책", "스마트시티"],
-    profileImage: "/profiles/kim-jeong-su.png",
-  },
-  {
-    name: "박민영",
-    organization: "행정안전부 정보화전략실",
-    role: "정보화전략실장",
-    grade: "거점리더",
-    message: "데이터 기반 행정혁신으로 국민 서비스 품질을 높이겠습니다.",
-    specialties: ["정보화전략", "빅데이터", "클라우드", "사이버보안"],
-    profileImage: "/profiles/park-min-young.png",
-  },
-  {
-    name: "이승호",
-    organization: "행정안전부 혁신기획관",
-    role: "혁신기획관",
-    grade: "거점리더",
-    message: "AI를 활용한 행정혁신으로 더 나은 미래를 설계하겠습니다.",
-    specialties: ["행정혁신", "AI정책", "디지털전환", "공공서비스"],
-    profileImage: "/profiles/lee-seung-ho.png",
-  },
-
-  // 블랙 등급
-  {
-    name: "최현우",
-    organization: "행정안전부 AI정책팀",
-    role: "AI정책팀장",
-    grade: "블랙",
-    message: "AI 윤리와 안전을 바탕으로 신뢰할 수 있는 AI 생태계를 구축하겠습니다.",
-    specialties: ["AI정책", "머신러닝", "AI윤리", "알고리즘"],
-    profileImage: "/profiles/choi-hyun-woo.png",
-  },
-  {
-    name: "정수연",
-    organization: "행정안전부 데이터분석팀",
-    role: "데이터분석팀장",
-    grade: "블랙",
-    message: "빅데이터 분석으로 정책 의사결정을 지원하겠습니다.",
-    specialties: ["빅데이터", "데이터분석", "통계모델링", "예측분석"],
-    profileImage: "/profiles/jung-su-yeon.png",
-  },
-  {
-    name: "강태민",
-    organization: "행정안전부 스마트정부팀",
-    role: "스마트정부팀장",
-    grade: "블랙",
-    message: "스마트 기술로 효율적이고 투명한 정부를 만들어가겠습니다.",
-    specialties: ["스마트정부", "IoT", "블록체인", "디지털트윈"],
-    profileImage: "/profiles/kang-tae-min.png",
-  },
-  {
-    name: "윤지혜",
-    organization: "행정안전부 사이버보안팀",
-    role: "사이버보안팀장",
-    grade: "블랙",
-    message: "AI 기반 보안 시스템으로 안전한 디지털 환경을 구축하겠습니다.",
-    specialties: ["사이버보안", "AI보안", "위협탐지", "보안정책"],
-    profileImage: "/profiles/yoon-ji-hye.png",
-  },
-
-  // 블루 등급
-  {
-    name: "김도현",
-    organization: "행정안전부 AI개발팀",
-    role: "AI개발 선임연구원",
-    grade: "블루",
-    message: "실용적인 AI 솔루션으로 국민 편의를 증진시키겠습니다.",
-    specialties: ["딥러닝", "자연어처리", "컴퓨터비전", "AI모델링"],
-    profileImage: "/profiles/kim-do-hyun.png",
-  },
-  {
-    name: "이소영",
-    organization: "행정안전부 데이터팀",
-    role: "데이터 사이언티스트",
-    grade: "블루",
-    message: "데이터의 가치를 발견하여 정책 혁신에 기여하겠습니다.",
-    specialties: ["데이터사이언스", "파이썬", "R", "시각화"],
-    profileImage: "/profiles/lee-so-young.png",
-  },
-  {
-    name: "박준혁",
-    organization: "행정안전부 플랫폼팀",
-    role: "플랫폼 아키텍트",
-    grade: "블루",
-    message: "안정적이고 확장 가능한 AI 플랫폼을 구축하겠습니다.",
-    specialties: ["클라우드아키텍처", "마이크로서비스", "DevOps", "쿠버네티스"],
-    profileImage: "/profiles/park-jun-hyuk.png",
-  },
-  {
-    name: "조민서",
-    organization: "행정안전부 UX팀",
-    role: "UX 디자이너",
-    grade: "블루",
-    message: "사용자 중심의 AI 서비스 경험을 설계하겠습니다.",
-    specialties: ["UX디자인", "사용자연구", "프로토타이핑", "인터랙션디자인"],
-    profileImage: "/profiles/jo-min-seo.png",
-  },
-  {
-    name: "한상민",
-    organization: "행정안전부 품질관리팀",
-    role: "AI 품질관리 전문가",
-    grade: "블루",
-    message: "AI 모델의 품질과 신뢰성을 보장하겠습니다.",
-    specialties: ["모델검증", "품질관리", "테스트자동화", "성능최적화"],
-    profileImage: "/profiles/han-sang-min.png",
-  },
-
-  // 그린 등급
-  {
-    name: "신예린",
-    organization: "행정안전부 AI연구팀",
-    role: "AI 연구원",
-    grade: "그린",
-    message: "새로운 AI 기술 연구로 혁신의 씨앗을 키우겠습니다.",
-    specialties: ["머신러닝", "파이썬", "텐서플로우", "연구개발"],
-    profileImage: "/profiles/shin-ye-rin.png",
-  },
-  {
-    name: "오태준",
-    organization: "행정안전부 개발팀",
-    role: "주니어 개발자",
-    grade: "그린",
-    message: "열정과 창의로 AI 서비스 개발에 기여하겠습니다.",
-    specialties: ["웹개발", "자바스크립트", "리액트", "API개발"],
-    profileImage: "/profiles/oh-tae-jun.png",
-  },
-  {
-    name: "김하은",
-    organization: "행정안전부 분석팀",
-    role: "데이터 분석가",
-    grade: "그린",
-    message: "데이터 분석을 통해 인사이트를 발굴하겠습니다.",
-    specialties: ["데이터분석", "SQL", "엑셀", "통계분석"],
-    profileImage: "/profiles/kim-ha-eun.png",
+    message: "AI 기술로 대한민국의 미래를 선도하겠습니다.",
+    specialties: ["AI정책", "디지털전환", "기술혁신"],
+    profileImage: "kim-jeong-su.png", // Storage 파일명
   },
   {
     name: "이준호",
-    organization: "행정안전부 기획팀",
-    role: "정책 기획자",
+    organization: "삼성전자",
+    role: "AI연구소장",
+    grade: "거점리더",
+    message: "혁신적인 AI 기술로 세상을 바꾸겠습니다.",
+    specialties: ["머신러닝", "딥러닝", "컴퓨터비전"],
+    profileImage: "lee-jun-ho.png",
+  },
+  {
+    name: "박민영",
+    organization: "네이버",
+    role: "AI플랫폼팀장",
+    grade: "블랙",
+    message: "사용자 중심의 AI 서비스를 만들어가겠습니다.",
+    specialties: ["자연어처리", "추천시스템", "검색엔진"],
+    profileImage: "park-min-young.png",
+  },
+  {
+    name: "최현우",
+    organization: "카카오",
+    role: "AI Lab 연구원",
+    grade: "블랙",
+    message: "AI로 더 나은 소통의 세상을 만들겠습니다.",
+    specialties: ["대화AI", "음성인식", "언어모델"],
+    profileImage: "choi-hyun-woo.png",
+  },
+  {
+    name: "정수연",
+    organization: "LG전자",
+    role: "AI제품기획자",
+    grade: "블루",
+    message: "생활 속 AI로 편리함을 선사하겠습니다.",
+    specialties: ["IoT", "스마트홈", "제품기획"],
+    profileImage: "jung-su-yeon.png",
+  },
+  {
+    name: "강태민",
+    organization: "현대자동차",
+    role: "자율주행개발자",
+    grade: "블루",
+    message: "안전한 자율주행의 미래를 구현하겠습니다.",
+    specialties: ["자율주행", "센서융합", "실시간처리"],
+    profileImage: "kang-tae-min.png",
+  },
+  {
+    name: "윤지혜",
+    organization: "SK텔레콤",
+    role: "AI서비스기획자",
     grade: "그린",
-    message: "AI 정책 기획으로 디지털 정부 발전에 기여하겠습니다.",
-    specialties: ["정책기획", "프로젝트관리", "업무분석", "문서작성"],
-    profileImage: "/profiles/lee-jun-ho.png",
+    message: "통신과 AI의 융합으로 새로운 가치를 창출하겠습니다.",
+    specialties: ["5G", "엣지컴퓨팅", "서비스기획"],
+    profileImage: "yoon-ji-hye.png",
+  },
+  {
+    name: "한상민",
+    organization: "NAVER AI Lab",
+    role: "연구원",
+    grade: "그린",
+    message: "창의적인 AI 연구로 기술 발전에 기여하겠습니다.",
+    specialties: ["강화학습", "로보틱스", "멀티모달"],
+    profileImage: "han-sang-min.png",
+  },
+  {
+    name: "오태준",
+    organization: "삼성SDS",
+    role: "AI솔루션 아키텍트",
+    grade: "그린",
+    message: "기업용 AI 솔루션으로 디지털 혁신을 이끌겠습니다.",
+    specialties: ["엔터프라이즈AI", "클라우드", "데이터분석"],
+    profileImage: "oh-tae-jun.png",
+  },
+
+  // 사진이 없는 챔피언들 (9명) - profileImage를 null로 설정
+  {
+    name: "김도현",
+    organization: "한국전자통신연구원",
+    role: "선임연구원",
+    grade: "거점리더",
+    message: "차세대 AI 기술 연구로 국가 경쟁력을 높이겠습니다.",
+    specialties: ["양자컴퓨팅", "뉴로모픽", "차세대AI"],
+    profileImage: null,
+  },
+  {
+    name: "이승호",
+    organization: "포스코ICT",
+    role: "AI사업부장",
+    grade: "거점리더",
+    message: "제조업의 AI 혁신을 선도하겠습니다.",
+    specialties: ["제조AI", "예측정비", "품질관리"],
+    profileImage: null,
+  },
+  {
+    name: "신예린",
+    organization: "우아한형제들",
+    role: "데이터사이언티스트",
+    grade: "블랙",
+    message: "데이터 기반 의사결정으로 비즈니스 가치를 창출하겠습니다.",
+    specialties: ["데이터분석", "예측모델링", "A/B테스트"],
+    profileImage: null,
+  },
+  {
+    name: "박준혁",
+    organization: "쿠팡",
+    role: "ML엔지니어",
+    grade: "블랙",
+    message: "고객 경험 향상을 위한 AI 기술을 개발하겠습니다.",
+    specialties: ["추천알고리즘", "물류최적화", "수요예측"],
+    profileImage: null,
+  },
+  {
+    name: "김하은",
+    organization: "라인",
+    role: "AI연구원",
+    grade: "블루",
+    message: "글로벌 AI 서비스로 세계와 소통하겠습니다.",
+    specialties: ["다국어처리", "번역AI", "글로벌서비스"],
+    profileImage: null,
+  },
+  {
+    name: "이소영",
+    organization: "넷마블",
+    role: "게임AI개발자",
+    grade: "블루",
+    message: "게임과 AI의 만남으로 새로운 재미를 창조하겠습니다.",
+    specialties: ["게임AI", "NPC행동", "절차적생성"],
+    profileImage: null,
   },
   {
     name: "정다은",
-    organization: "행정안전부 지원팀",
-    role: "AI 운영 담당자",
+    organization: "토스",
+    role: "핀테크AI개발자",
     grade: "그린",
-    message: "AI 시스템 운영으로 안정적인 서비스를 제공하겠습니다.",
-    specialties: ["시스템운영", "모니터링", "장애대응", "사용자지원"],
-    profileImage: "/profiles/jung-da-eun.png",
+    message: "금융 서비스의 AI 혁신을 이끌어가겠습니다.",
+    specialties: ["금융AI", "리스크관리", "사기탐지"],
+    profileImage: null,
   },
   {
     name: "최민재",
-    organization: "행정안전부 교육팀",
-    role: "AI 교육 담당자",
+    organization: "배달의민족",
+    role: "추천시스템개발자",
     grade: "그린",
-    message: "AI 교육을 통해 디지털 역량 강화에 기여하겠습니다.",
-    specialties: ["교육기획", "콘텐츠개발", "강의", "역량평가"],
-    profileImage: "/profiles/choi-min-jae.png",
+    message: "맛있는 경험을 위한 AI 기술을 개발하겠습니다.",
+    specialties: ["추천시스템", "개인화", "사용자경험"],
+    profileImage: null,
+  },
+  {
+    name: "조민서",
+    organization: "당근마켓",
+    role: "커뮤니티AI개발자",
+    grade: "그린",
+    message: "따뜻한 커뮤니티를 위한 AI 기술을 만들겠습니다.",
+    specialties: ["커뮤니티AI", "콘텐츠필터링", "사용자안전"],
+    profileImage: null,
   },
 ]
+
+// 샘플 데이터를 Supabase에 삽입하는 함수
+export async function insertSampleData() {
+  const { supabase } = await import("./supabase")
+
+  try {
+    // 기존 데이터 확인
+    const { data: existingData } = await supabase.from("champions").select("name")
+    const existingNames = existingData?.map((item) => item.name) || []
+
+    // 중복되지 않는 데이터만 필터링
+    const newChampions = sampleChampions.filter((champion) => !existingNames.includes(champion.name))
+
+    if (newChampions.length === 0) {
+      console.log("모든 샘플 데이터가 이미 존재합니다.")
+      return { success: true, message: "모든 샘플 데이터가 이미 존재합니다." }
+    }
+
+    // 새로운 데이터 삽입
+    const { error } = await supabase.from("champions").insert(
+      newChampions.map((champion) => ({
+        name: champion.name,
+        organization: champion.organization,
+        role: champion.role,
+        grade: champion.grade,
+        message: champion.message,
+        specialties: champion.specialties,
+        profile_image_url: champion.profileImage, // 파일명 또는 null
+      })),
+    )
+
+    if (error) {
+      console.error("샘플 데이터 삽입 오류:", error)
+      throw error
+    }
+
+    console.log(`${newChampions.length}개의 새로운 샘플 데이터가 삽입되었습니다.`)
+    return {
+      success: true,
+      message: `${newChampions.length}개의 새로운 샘플 데이터가 삽입되었습니다.`,
+    }
+  } catch (error) {
+    console.error("샘플 데이터 삽입 실패:", error)
+    return {
+      success: false,
+      message: "샘플 데이터 삽입에 실패했습니다.",
+    }
+  }
+}
+
+// Storage 파일 목록 조회
+export async function listStorageFiles() {
+  const { supabase } = await import("./supabase")
+
+  try {
+    const { data, error } = await supabase.storage.from("champion-profiles").list("", { limit: 100 })
+
+    if (error) {
+      console.error("Storage 파일 목록 조회 오류:", error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("Storage 파일 목록 조회 실패:", error)
+    return []
+  }
+}
